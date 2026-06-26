@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>URL Guardian — Phishing URL Detector</title>
+<meta name="description" content="Client-side, rule-based phishing URL analysis. Runs entirely in your browser — nothing is sent anywhere." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2 4 5v6c0 5.25 3.4 9.32 8 11 4.6-1.68 8-5.75 8-11V5l-8-3Z"/>
+          <path d="m9.5 12 2 2 3.5-4"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <h1>URL Guardian</h1>
+        <p class="brand-tagline">Rule-Based Phishing URL Detection</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="status-pill"><span class="status-dot" aria-hidden="true"></span><span>Engine ready · 16 rules loaded</span></span>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <section class="scan-section" aria-label="Analyze a URL">
+    <div class="scan-card">
+      <form id="scan-form" class="scan-form" autocomplete="off">
+        <label for="url-input" class="sr-only">URL to analyze</label>
+        <div class="scan-input-row" id="scan-input-row">
+          <span class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m20 20-3.5-3.5"/>
+            </svg>
+          </span>
+          <input id="url-input" name="url" type="text" inputmode="url" placeholder="Paste a URL to analyze — e.g. http://example.com/login" autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <button type="submit" id="analyze-btn" class="btn-primary">
+            <span class="btn-label">Analyze</span>
+            <span class="btn-spinner" hidden></span>
+          </button>
+        </div>
+        <p class="input-error" id="input-error" role="alert"></p>
+      </form>
+
+      <div class="sample-row">
+        <span class="sample-label">Try a sample:</span>
+        <div class="sample-chips" id="sample-chips"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="content-grid">
+
+    <section class="results-column" id="results-column">
+
+      <div class="empty-state" id="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="4.5"/>
+          <line x1="12" y1="2.5" x2="12" y2="5.2"/>
+          <line x1="12" y1="18.8" x2="12" y2="21.5"/>
+          <line x1="2.5" y1="12" x2="5.2" y2="12"/>
+          <line x1="18.8" y1="12" x2="21.5" y2="12"/>
+        </svg>
+        <h3>No scan yet</h3>
+        <p>Paste a URL above and run an analysis, or try one of the sample links to see the engine in action.</p>
+      </div>
+
+      <div class="dashboard" id="dashboard" hidden>
+
+        <div class="panel verdict-panel">
+          <div class="gauge-wrap">
+            <svg class="gauge-svg" id="score-gauge" viewBox="0 0 200 200">
+              <circle class="gauge-track" cx="100" cy="100" r="84" />
+              <circle class="gauge-progress" id="gauge-progress" cx="100" cy="100" r="84" />
+            </svg>
+            <div class="gauge-center">
+              <span id="score-number">0</span>
+              <span class="gauge-max">/ 100</span>
+            </div>
+          </div>
+          <div class="verdict-info">
+            <span class="risk-badge" id="risk-badge">SAFE</span>
+            <p class="recommendation-text" id="recommendation-text"></p>
+            <div class="verdict-actions">
+              <button class="btn-ghost" id="export-json-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                Export JSON
+              </button>
+              <button class="btn-ghost" id="export-pdf-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4a1 1 0 0 1 1-1h7l4 4v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2"/><rect x="2" y="11" width="11" height="7" rx="1.2"/></svg>
+                Export PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel details-panel">
+          <h2 class="panel-title">URL Details</h2>
+          <div class="details-grid" id="details-grid"></div>
+        </div>
+
+        <div class="panel findings-panel">
+          <div class="panel-header-row">
+            <h2 class="panel-title">Findings</h2>
+            <span class="findings-count-badge" id="findings-count">0</span>
+          </div>
+          <div class="findings-list" id="findings-list"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <aside class="history-column" aria-label="Recent scans">
+      <div class="panel history-panel">
+        <div class="panel-header-row">
+          <h2 class="panel-title">Recent Scans</h2>
+          <button class="btn-text-danger" id="clear-history-btn" type="button">Clear</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <p class="history-empty">No scans yet.</p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>URL Guardian runs a client-side heuristic rule set entirely in your browser — no URL is ever sent to a server. It's a portfolio/educational project, not a threat-intelligence product: treat every verdict as supporting evidence, not proof. Always corroborate high-risk findings through an official channel before acting on them.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<div class="print-only" id="print-report" aria-hidden="true"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
