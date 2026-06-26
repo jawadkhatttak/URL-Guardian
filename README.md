@@ -10,6 +10,22 @@ This project focuses on clean architecture, maintainability, and user experience
 
 ---
 
+## Preview
+
+UI:
+
+<img width="1358" height="916" alt="Image" src="https://github.com/user-attachments/assets/033c2f33-e5a4-4ec4-90ac-abd880765d66" />
+
+<img width="1358" height="1439" alt="Image" src="https://github.com/user-attachments/assets/90690b93-65d5-44c2-9892-559226a5e8e5" />
+
+Output as Json:
+
+<img width="1113" height="527" alt="Image" src="https://github.com/user-attachments/assets/b87e567a-2c06-44ee-be65-1f94068db8d1" />
+
+Output as PDF:
+
+<img width="718" height="620" alt="Image" src="https://github.com/user-attachments/assets/95126e40-21b3-4e54-9dc1-f4add3679961" />
+
 ## Features
 
 * Modular rule-based phishing detection engine (16 independent rules)
