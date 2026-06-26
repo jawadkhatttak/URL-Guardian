@@ -2,6 +2,8 @@
 
 A frontend phishing URL analysis tool that evaluates URLs using a modular, rule-based detection engine and presents the results in a modern cybersecurity dashboard.
 
+🔗 **[Live Demo](https://jawadkhatttak.github.io/URL-Guardian/)**
+
 ## Overview
 
 URL Guardian analyzes URLs for common phishing indicators using independent detection rules. Instead of relying on a single heuristic, the application combines multiple signals into a weighted risk score, producing an explainable security assessment.
