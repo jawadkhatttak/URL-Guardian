@@ -115,9 +115,12 @@ url-guardian/
     │   └── ruleDependencies.js # suppression rules for overlapping findings
     ├── rules/                # 16 independent detectors, one file each
     ├── data/                 # brand list, shortener list, keyword list,
-    │                         # curated public-suffix list, confusables table
+    │                         # generated Public Suffix List data, confusables table
     ├── ui/                   # DOM rendering, history, sample chips, export
     └── utils/                # Levenshtein, Shannon entropy, storage, formatting
+scripts/
+    └── generate-suffix-list.mjs  # build-time only: regenerates js/data/publicSuffixList.js
+                                    # from a fresh copy of the real Public Suffix List
 ```
 
 ---
@@ -148,7 +151,7 @@ url-guardian/
 
 Worth knowing before treating this as more than a portfolio/educational tool:
 
-* **Domain parsing uses a curated suffix list, not the real Public Suffix List.** The real PSL has 9,000+ entries and normally ships inside a package (`tldts`, `psl`) — pulling one in would require a bundler or CDN dependency, which conflicts with the vanilla-JS, no-build-tooling goal here. The curated list covers common cases and falls back to "last label is the TLD" otherwise.
+* **Domain parsing uses a real, generated snapshot of the actual Public Suffix List** (`js/data/publicSuffixList.js`, ~9,900 exact rules + 283 wildcard rules + 8 exception rules, fetched from [publicsuffix.org's official GitHub mirror](https://github.com/publicsuffix/list) and pre-punycoded). It is **not a live feed** — the PSL adds/removes entries occasionally, so this snapshot can drift out of date. Run `node scripts/generate-suffix-list.mjs` from the repo root periodically to refresh it against the current list. This script is build-time-only, has zero npm dependencies, and is never imported by any browser-facing code — the shipped app itself still has no runtime dependency on anything beyond the static data file it produces.
 * **Brand and shortener lists are short and curated**, not exhaustive threat-intel databases — expect both false negatives (an unlisted brand won't be flagged) and occasional false positives.
 * **"Export PDF" uses the browser's native print dialog**, not a generated PDF byte stream — building one from scratch client-side would require a library like jsPDF.
 * **Every rule is independently defeatable.** This is heuristic pattern-matching, not threat intelligence. Treat every score as supporting evidence for a human decision, not a verdict.
@@ -193,6 +196,21 @@ This project is being developed in multiple stages.
 
 ---
 
+## Contributing
+
+The rule engine was deliberately built so adding to it doesn't require touching the rest of the app. If you want to add a detection rule:
+
+1. Create a file in `js/rules/` exporting `{ id, check(ctx) }`, where `check` returns a finding object or `null`.
+2. Register it in `js/rules/index.js`.
+3. Add a weight for it in `js/core/ruleWeights.js`.
+
+That's the whole integration surface — no other file needs to change. `js/core/analyzer.js` iterates the rule list automatically, and a single misbehaving rule can't take down a scan (each one runs in its own try/catch).
+
+Bug reports, false-positive/false-negative examples, and PRs are welcome — especially real-world phishing URLs that slip past the current rule set, since that's the fastest way to make the detection meaningfully better. Open an issue or a PR; if you're proposing a new rule, a short note on what pattern it catches and why is enough to start the conversation.
+
+---
+
 ## Purpose
 
 The goal of this project is to explore how modern phishing detection systems work by gradually evolving a frontend rule engine into a full-stack security analysis platform.
+
