@@ -1,7 +1,7 @@
 import { parseUrl } from './parser.js';
 import { calculateScore } from './score.js';
 import { applySuppression } from './ruleDependencies.js';
-import { RULES } from '../rules/index.js';
+import { RULES } from '../rules/inde.js';
 
 /**
  * Runs the full pipeline for a single URL and returns a self-contained
