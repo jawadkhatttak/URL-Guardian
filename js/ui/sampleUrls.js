@@ -1,7 +1,7 @@
 export const SAMPLE_URLS = [
   { label: 'paypal.com', url: 'https://www.paypal.com/signin', kind: 'safe' },
   { label: 'github.com', url: 'https://github.com/login', kind: 'safe' },
-  { label: 'typosquat domain', url: 'http://paypa1.com/account/verify', kind: 'phish' },
+  { label: 'typosquat domain', url: 'http://www.paypa1.com/account/verify', kind: 'phish' },
   { label: 'IP address host', url: 'http://185.23.41.9/secure/login.php', kind: 'phish' },
   { label: 'link shortener', url: 'http://bit.ly/3xK9zQ', kind: 'phish' },
   { label: '"@" redirect trick', url: 'http://www.your-bank.com@malicious-capture.ru/login', kind: 'phish' },
